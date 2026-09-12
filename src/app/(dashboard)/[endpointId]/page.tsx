@@ -36,7 +36,10 @@ export default async function DashboardPage({ params }: Props) {
     .limit(isAuthenticated ? 50 : 1)
 
   const initialPayloads = (data ?? []) as WebhookRow[]
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? ''
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_BASE_URL ??
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+  ).replace(/\/+$/, '')
   const catchUrl = `${baseUrl}/api/catch/${endpointId}`
 
   return (
