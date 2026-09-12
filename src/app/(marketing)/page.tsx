@@ -1,0 +1,48 @@
+import { GenerateButton } from './generate-button'
+
+export default function HomePage() {
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="max-w-2xl w-full text-center flex flex-col items-center gap-8">
+        {/* Badge */}
+        <span className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900 px-4 py-1.5 text-xs font-medium text-zinc-400">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          No sign-up required
+        </span>
+
+        {/* Hero */}
+        <div className="flex flex-col items-center gap-4">
+          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight text-zinc-50">
+            Catch webhooks.{' '}
+            <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              Instantly.
+            </span>
+          </h1>
+          <p className="text-lg text-zinc-400 max-w-xl">
+            Generate a unique URL, point any service at it, and watch every request arrive live in
+            your browser — no setup, no auth.
+          </p>
+        </div>
+
+        {/* CTA */}
+        <GenerateButton />
+
+        {/* Features */}
+        <div className="grid grid-cols-3 gap-6 w-full mt-4 text-sm text-zinc-500">
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-xl">⚡</span>
+            <span>Real-time</span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-xl">🔍</span>
+            <span>Inspect headers &amp; body</span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-xl">🗑️</span>
+            <span>Auto-expires in 24h</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  )
+}
