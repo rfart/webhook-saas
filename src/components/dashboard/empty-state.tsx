@@ -1,7 +1,19 @@
+'use client'
+
+import { useState } from 'react'
+
 export function EmptyState({ catchUrl }: { catchUrl: string }) {
+  const [copied, setCopied] = useState(false)
+
   const curlExample = `curl -X POST ${catchUrl} \\
   -H "Content-Type: application/json" \\
   -d '{"hello": "world"}'`
+
+  async function copy() {
+    await navigator.clipboard.writeText(curlExample)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center gap-6">
@@ -15,7 +27,15 @@ export function EmptyState({ catchUrl }: { catchUrl: string }) {
         </p>
       </div>
       <div className="w-full max-w-xl text-left">
-        <p className="text-xs text-zinc-500 mb-2 font-mono">Try it now:</p>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs text-zinc-500 font-mono">Try it now:</p>
+          <button
+            onClick={copy}
+            className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+          >
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
         <pre className="overflow-x-auto rounded-lg bg-zinc-900 p-4 text-xs text-zinc-300 font-mono leading-relaxed">
           {curlExample}
         </pre>
