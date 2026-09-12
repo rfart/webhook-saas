@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-export function EndpointHeader({ catchUrl }: { catchUrl: string }) {
+export function EndpointHeader({ catchUrl, endpointId: _endpointId }: { catchUrl: string; endpointId?: string }) {
   const [copied, setCopied] = useState(false)
 
   async function copy() {

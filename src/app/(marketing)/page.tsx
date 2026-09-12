@@ -7,7 +7,7 @@ export default function HomePage() {
         {/* Badge */}
         <span className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900 px-4 py-1.5 text-xs font-medium text-zinc-400">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-          No sign-up required
+          Sign in with Google to unlock history
         </span>
 
         {/* Hero */}
@@ -20,7 +20,7 @@ export default function HomePage() {
           </h1>
           <p className="text-lg text-zinc-400 max-w-xl">
             Generate a unique URL, point any service at it, and watch every request arrive live in
-            your browser — no setup, no auth.
+            your browser. Sign in with Google to view full history and share with your team.
           </p>
         </div>
 
@@ -38,8 +38,8 @@ export default function HomePage() {
             <span>Inspect headers &amp; body</span>
           </div>
           <div className="flex flex-col items-center gap-1">
-            <span className="text-xl">🗑️</span>
-            <span>Auto-expires in 24h</span>
+            <span className="text-xl">🔐</span>
+            <span>Google sign-in for history</span>
           </div>
         </div>
       </div>

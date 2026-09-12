@@ -23,3 +23,6 @@ Thumbs.db
 # Editor
 .idea/
 .vscode/
+
+# Supabase CLI temp files (contains personal email + DB connection string)
+supabase/.temp/
