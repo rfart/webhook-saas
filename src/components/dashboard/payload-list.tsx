@@ -57,35 +57,6 @@ export function PayloadList({ endpointId, initialPayloads, catchUrl }: PayloadLi
     }
   }, [endpointId, addRow])
 
-  // Polling fallback every 5s
-  useEffect(() => {
-    const client = supabase.current
-
-    async function poll() {
-      const mostRecent = payloads[0]?.received_at
-      let query = client
-        .from('webhooks')
-        .select('*')
-        .eq('endpoint_id', endpointId)
-        .order('received_at', { ascending: false })
-        .limit(50)
-
-      if (mostRecent) {
-        query = query.gt('received_at', mostRecent)
-      }
-
-      const { data } = await query
-      if (data) {
-        for (const row of data as WebhookRow[]) {
-          addRow(row)
-        }
-      }
-    }
-
-    const interval = setInterval(poll, 5000)
-    return () => clearInterval(interval)
-  }, [endpointId, payloads, addRow])
-
   if (payloads.length === 0) {
     return <EmptyState catchUrl={catchUrl} />
   }
