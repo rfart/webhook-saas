@@ -29,7 +29,7 @@ export function HistoryGate({ endpointId }: Props) {
         <p className="text-sm font-medium text-zinc-300">
           Sign in to view full history (up to 50 requests)
         </p>
-        <SignInButton next={`/${endpointId}`} />
+        <SignInButton next="/webhooks" />
       </div>
     </div>
   )

@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   }
 
   const code = searchParams.get('code')
-  const rawNext = searchParams.get('next') ?? '/'
+  const rawNext = searchParams.get('next') ?? '/webhooks'
   const next = rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.includes('://')
     ? rawNext
     : '/'
