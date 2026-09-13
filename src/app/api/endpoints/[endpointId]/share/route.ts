@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSSRServerClient } from '@/lib/supabase/ssr-server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { BASE_PATH } from '@/lib/base-path'
 
 interface Params {
   params: Promise<{ endpointId: string }>
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   if (existing) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? request.nextUrl.origin
-    return NextResponse.json({ shareUrl: `${baseUrl}/share/${existing.share_token}` })
+    return NextResponse.json({ shareUrl: `${baseUrl}${BASE_PATH}/share/${existing.share_token}` })
   }
 
   const { data: share } = await serviceClient
@@ -74,5 +75,5 @@ export async function POST(request: NextRequest, { params }: Params) {
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? request.nextUrl.origin
-  return NextResponse.json({ shareUrl: `${baseUrl}/share/${share.share_token}` })
+  return NextResponse.json({ shareUrl: `${baseUrl}${BASE_PATH}/share/${share.share_token}` })
 }

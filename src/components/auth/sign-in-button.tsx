@@ -1,6 +1,7 @@
 'use client'
 
 import { createBrowserSupabaseClient } from '@/lib/supabase/client'
+import { BASE_PATH } from '@/lib/base-path'
 
 interface Props {
   next?: string
@@ -13,7 +14,7 @@ export function SignInButton({ next = '/' }: Props) {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${baseUrl}/api/auth/callback?next=${encodeURIComponent(next)}`,
+        redirectTo: `${baseUrl}${BASE_PATH}/api/auth/callback?next=${encodeURIComponent(next)}`,
       },
     })
   }

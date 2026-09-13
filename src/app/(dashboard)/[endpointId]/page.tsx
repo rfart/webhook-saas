@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createSSRServerClient } from '@/lib/supabase/ssr-server'
 import type { WebhookRow } from '@/types'
+import { BASE_PATH } from '@/lib/base-path'
 import { EndpointHeader } from '@/components/dashboard/endpoint-header'
 import { PayloadList } from '@/components/dashboard/payload-list'
 import { HistoryGate } from '@/components/dashboard/history-gate'
@@ -40,7 +41,7 @@ export default async function DashboardPage({ params }: Props) {
     process.env.NEXT_PUBLIC_BASE_URL ??
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
   ).replace(/\/+$/, '')
-  const catchUrl = `${baseUrl}/api/catch/${endpointId}`
+  const catchUrl = `${baseUrl}${BASE_PATH}/api/catch/${endpointId}`
 
   return (
     <div className="min-h-screen">

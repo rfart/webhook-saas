@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
+import { BASE_PATH } from '@/lib/base-path'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
   const { data: sessionData, error } = await supabase.auth.exchangeCodeForSession(code)
 
   if (error || !sessionData.user) {
-    return NextResponse.redirect(`${baseUrl}/auth/sign-in`)
+    return NextResponse.redirect(`${baseUrl}${BASE_PATH}/auth/sign-in`)
   }
 
   const { user } = sessionData

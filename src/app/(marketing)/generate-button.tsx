@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { BASE_PATH } from '@/lib/base-path'
 
 export function GenerateButton() {
   const router = useRouter()
@@ -11,7 +12,7 @@ export function GenerateButton() {
   async function generate() {
     setLoading(true)
     try {
-      const res = await fetch('/api/endpoints', { method: 'POST' })
+      const res = await fetch(`${BASE_PATH}/api/endpoints`, { method: 'POST' })
       const { endpointId } = await res.json()
       router.push(`/${endpointId}`)
     } catch {

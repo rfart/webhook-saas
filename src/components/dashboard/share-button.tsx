@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { BASE_PATH } from '@/lib/base-path'
 
 interface Props {
   endpointId: string
@@ -12,7 +13,7 @@ export function ShareButton({ endpointId }: Props) {
   async function handleShare() {
     setState('loading')
     try {
-      const res = await fetch(`/api/endpoints/${endpointId}/share`, { method: 'POST' })
+      const res = await fetch(`${BASE_PATH}/api/endpoints/${endpointId}/share`, { method: 'POST' })
       const json = await res.json()
       if (json.shareUrl) {
         await navigator.clipboard.writeText(json.shareUrl)

@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { createSSRServerClient } from '@/lib/supabase/ssr-server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import type { WebhookRow } from '@/types'
+import { BASE_PATH } from '@/lib/base-path'
 import { EndpointHeader } from '@/components/dashboard/endpoint-header'
 import { PayloadList } from '@/components/dashboard/payload-list'
 import { UserMenu } from '@/components/auth/user-menu'
@@ -18,7 +19,7 @@ export default async function SharePage({ params }: Props) {
   const { data: { user } } = await ssrClient.auth.getUser()
 
   if (!user) {
-    redirect(`/auth/sign-in?next=/share/${token}`)
+    redirect(`${BASE_PATH}/auth/sign-in?next=${BASE_PATH}/share/${token}`)
   }
 
   // Look up share token
@@ -35,7 +36,7 @@ export default async function SharePage({ params }: Props) {
 
   const endpointId: string = share.endpoint_id
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? ''
-  const catchUrl = `${baseUrl}/api/catch/${endpointId}`
+  const catchUrl = `${baseUrl}${BASE_PATH}/api/catch/${endpointId}`
 
   const { data } = await serviceClient
     .from('webhooks')
