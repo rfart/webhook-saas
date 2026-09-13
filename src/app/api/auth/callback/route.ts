@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   const next = rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.includes('://')
     ? rawNext
     : '/'
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? request.nextUrl.origin
+  const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL ?? request.nextUrl.origin).replace(/\/+$/, '')
 
   if (!code) {
     return NextResponse.redirect(`${baseUrl}${next}`)

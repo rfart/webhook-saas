@@ -50,7 +50,6 @@ export default async function DashboardPage({ params }: Props) {
           <EndpointHeader catchUrl={catchUrl} endpointId={endpointId} />
           {isAuthenticated && (
             <div className="flex items-center gap-3 shrink-0 ml-4">
-              <ShareButton endpointId={endpointId} />
               <UserMenu user={user} />
             </div>
           )}
@@ -60,13 +59,16 @@ export default async function DashboardPage({ params }: Props) {
             <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">
               Received Requests
             </h2>
-            {initialPayloads.length > 0 && (
-              <span className="text-xs text-zinc-600">
-                {isAuthenticated
-                  ? `${initialPayloads.length} request(s) — last 24h`
-                  : 'Showing most recent — sign in for full history'}
-              </span>
-            )}
+            <div className="flex items-center gap-3">
+              {initialPayloads.length > 0 && (
+                <span className="text-xs text-zinc-600">
+                  {isAuthenticated
+                    ? `${initialPayloads.length} request(s) — last 24h`
+                    : 'Showing most recent — sign in for full history'}
+                </span>
+              )}
+              {isAuthenticated && <ShareButton endpointId={endpointId} />}
+            </div>
           </div>
           <PayloadList
             endpointId={endpointId}
