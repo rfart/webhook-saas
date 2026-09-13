@@ -17,7 +17,7 @@ export function UserMenu({ user }: Props) {
   async function handleSignOut() {
     const supabase = createBrowserSupabaseClient()
     await supabase.auth.signOut()
-    window.location.reload()
+    window.location.href = '/webhooks'
   }
 
   return (
