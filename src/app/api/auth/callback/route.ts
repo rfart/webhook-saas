@@ -6,8 +6,8 @@ import { BASE_PATH } from '@/lib/base-path'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl
-  const error = searchParams.get('error')
-  if (error) {
+  const oauthError = searchParams.get('error')
+  if (oauthError) {
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL ?? request.nextUrl.origin}/`)
   }
 
