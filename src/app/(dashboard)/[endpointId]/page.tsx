@@ -1,10 +1,11 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createSSRServerClient } from '@/lib/supabase/ssr-server'
 import type { WebhookRow } from '@/types'
 import { BASE_PATH } from '@/lib/base-path'
 import { EndpointHeader } from '@/components/dashboard/endpoint-header'
 import { PayloadList } from '@/components/dashboard/payload-list'
+import { HistoryGate } from '@/components/dashboard/history-gate'
 import { UserMenu } from '@/components/auth/user-menu'
 import { ShareButton } from '@/components/dashboard/share-button'
 
@@ -21,21 +22,19 @@ export default async function DashboardPage({ params }: Props) {
     notFound()
   }
 
-  // Require auth — logged-out users get no access to endpoint history
+  // Check auth — anonymous users get limited view, not a redirect
   const ssrClient = await createSSRServerClient()
   const { data: { user } } = await ssrClient.auth.getUser()
+  const isAuthenticated = !!user
 
-  if (!user) {
-    redirect('/auth/sign-in?next=/webhooks')
-  }
-
+  // Fetch payloads — 1 for anon (most recent), 50 for auth
   const supabase = createServerSupabaseClient()
   const { data } = await supabase
     .from('webhooks')
     .select('*')
     .eq('endpoint_id', endpointId)
     .order('received_at', { ascending: false })
-    .limit(50)
+    .limit(isAuthenticated ? 50 : 1)
 
   const initialPayloads = (data ?? []) as WebhookRow[]
   const baseUrl = (
@@ -49,9 +48,11 @@ export default async function DashboardPage({ params }: Props) {
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex items-center justify-between py-4">
           <EndpointHeader catchUrl={catchUrl} endpointId={endpointId} />
-          <div className="flex items-center gap-3 shrink-0 ml-4">
-            <UserMenu user={user} />
-          </div>
+          {isAuthenticated && (
+            <div className="flex items-center gap-3 shrink-0 ml-4">
+              <UserMenu user={user} />
+            </div>
+          )}
         </div>
         <div className="py-6">
           <div className="flex items-center justify-between mb-4">
@@ -61,17 +62,21 @@ export default async function DashboardPage({ params }: Props) {
             <div className="flex items-center gap-3">
               {initialPayloads.length > 0 && (
                 <span className="text-xs text-zinc-600">
-                  {initialPayloads.length} request(s) — last 24h
+                  {isAuthenticated
+                    ? `${initialPayloads.length} request(s) — last 24h`
+                    : 'Showing most recent — sign in for full history'}
                 </span>
               )}
-              <ShareButton endpointId={endpointId} />
+              {isAuthenticated && <ShareButton endpointId={endpointId} />}
             </div>
           </div>
           <PayloadList
+            key={isAuthenticated ? 'auth' : 'anon'}
             endpointId={endpointId}
             initialPayloads={initialPayloads}
             catchUrl={catchUrl}
           />
+          {!isAuthenticated && <HistoryGate endpointId={endpointId} />}
         </div>
       </div>
     </div>
