@@ -49,6 +49,15 @@ export async function POST(request: NextRequest, { params }: Params) {
   }
 
   if (!endpoint) {
+    const { count } = await serviceClient
+      .from('endpoints')
+      .select('id', { count: 'exact', head: true })
+      .eq('lead_id', lead.id)
+
+    if ((count ?? 0) >= 8) {
+      return NextResponse.json({ error: 'Endpoint limit reached' }, { status: 429 })
+    }
+
     const { data: newEndpoint } = await serviceClient
       .from('endpoints')
       .insert({ id: endpointId, lead_id: lead.id })
