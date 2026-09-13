@@ -71,6 +71,7 @@ export default async function DashboardPage({ params }: Props) {
             </div>
           </div>
           <PayloadList
+            key={isAuthenticated ? 'auth' : 'anon'}
             endpointId={endpointId}
             initialPayloads={initialPayloads}
             catchUrl={catchUrl}
