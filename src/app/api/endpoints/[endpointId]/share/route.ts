@@ -10,6 +10,12 @@ interface Params {
 export async function POST(request: NextRequest, { params }: Params) {
   const { endpointId } = await params
 
+  // Validate UUID format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (!uuidRegex.test(endpointId)) {
+    return NextResponse.json({ error: 'Invalid endpoint ID' }, { status: 400 })
+  }
+
   // Require auth
   const ssrClient = await createSSRServerClient()
   const { data: { user } } = await ssrClient.auth.getUser()
@@ -34,15 +40,19 @@ export async function POST(request: NextRequest, { params }: Params) {
   // Get or create an endpoint record
   let { data: endpoint } = await serviceClient
     .from('endpoints')
-    .select('id')
+    .select('id, lead_id')
     .eq('id', endpointId)
     .single()
+
+  if (endpoint && endpoint.lead_id && endpoint.lead_id !== lead.id) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   if (!endpoint) {
     const { data: newEndpoint } = await serviceClient
       .from('endpoints')
       .insert({ id: endpointId, lead_id: lead.id })
-      .select('id')
+      .select('id, lead_id')
       .single()
     endpoint = newEndpoint
   }

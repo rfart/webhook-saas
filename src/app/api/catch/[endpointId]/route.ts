@@ -31,6 +31,13 @@ async function handler(
     return NextResponse.json({ error: 'Invalid endpoint ID' }, { status: 400 })
   }
 
+  // Reject oversized payloads
+  const MAX_BYTES = 1 * 1024 * 1024 // 1 MB
+  const contentLength = req.headers.get('content-length')
+  if (contentLength && parseInt(contentLength, 10) > MAX_BYTES) {
+    return NextResponse.json({ error: 'Payload too large' }, { status: 413 })
+  }
+
   // Collect headers (skip Vercel internals)
   const headers: Record<string, string> = {}
   req.headers.forEach((value, key) => {
@@ -79,7 +86,7 @@ async function handler(
 
   if (error) {
     console.error('Supabase insert error:', error)
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'Failed to store webhook' }, { status: 500 })
   }
 
   return NextResponse.json({ ok: true, endpointId, method: req.method })
