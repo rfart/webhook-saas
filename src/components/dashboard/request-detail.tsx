@@ -1,9 +1,134 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { WebhookRow } from '@/types'
 import { Badge } from '@/components/ui/badge'
 import { CodeBlock } from '@/components/ui/code-block'
+
+const FORMATS = [
+  {
+    id: 'url',
+    label: 'URL',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0">
+        <path d="M6.5 9.5l3-3M5.5 7l-1.5 1.5a2.828 2.828 0 004 4l1.5-1.5M10.5 9l1.5-1.5a2.828 2.828 0 00-4-4L6.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'curl',
+    label: 'cURL',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0">
+        <path d="M2 4l4 4-4 4M8 12h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'fetch',
+    label: 'fetch (JS)',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0">
+        <path d="M4 3l-3 5 3 5M12 3l3 5-3 5M9 2l-2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'python',
+    label: 'Python',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0">
+        <path d="M4 3l-3 5 3 5M12 3l3 5-3 5M9 2l-2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'powershell',
+    label: 'PowerShell',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0">
+        <path d="M4 3l-3 5 3 5M12 3l3 5-3 5M9 2l-2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
+    id: 'har',
+    label: 'HAR',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0">
+        <rect x="2" y="2" width="12" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+        <path d="M5 6h6M5 9h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+]
+
+function generateFormat(format: string, payload: WebhookRow, catchUrl: string): string {
+  const method = payload.method.toUpperCase()
+  const headers = payload.headers as Record<string, string>
+  const body = payload.payload
+
+  switch (format) {
+    case 'url':
+      return catchUrl
+
+    case 'curl': {
+      const headerFlags = Object.entries(headers)
+        .map(([k, v]) => `  -H '${k}: ${v}'`)
+        .join(' \\\n')
+      const bodyFlag = body && Object.keys(body).length > 0
+        ? ` \\\n  -d '${JSON.stringify(body)}'`
+        : ''
+      return `curl -X ${method} '${catchUrl}' \\\n${headerFlags}${bodyFlag}`
+    }
+
+    case 'fetch': {
+      const headersObj = JSON.stringify(headers, null, 2)
+        .split('\n').join('\n    ')
+      const bodyPart = body && Object.keys(body).length > 0
+        ? `,\n  body: JSON.stringify(${JSON.stringify(body, null, 2)})`
+        : ''
+      return `fetch('${catchUrl}', {\n  method: '${method}',\n  headers: ${headersObj}${bodyPart}\n})`
+    }
+
+    case 'python': {
+      const headersObj = JSON.stringify(headers, null, 2)
+      const bodyPart = body && Object.keys(body).length > 0
+        ? `,\n    json=${JSON.stringify(body, null, 2)}`
+        : ''
+      return `import requests\n\nrequests.${method.toLowerCase()}(\n    '${catchUrl}',\n    headers=${headersObj}${bodyPart}\n)`
+    }
+
+    case 'powershell': {
+      const headerPairs = Object.entries(headers)
+        .map(([k, v]) => `  '${k}' = '${v}'`)
+        .join(";\n")
+      const bodyPart = body && Object.keys(body).length > 0
+        ? ` \`\n  -Body '${JSON.stringify(body)}'`
+        : ''
+      return `Invoke-WebRequest -Uri '${catchUrl}' -Method ${method} \`\n  -Headers @{\n${headerPairs}\n  }${bodyPart}`
+    }
+
+    case 'har': {
+      const harRequest = {
+        method,
+        url: catchUrl,
+        httpVersion: 'HTTP/1.1',
+        headers: Object.entries(headers).map(([name, value]) => ({ name, value })),
+        queryString: Object.entries(payload.query_params as Record<string, string>).map(([name, value]) => ({ name, value })),
+        postData: body && Object.keys(body).length > 0
+          ? { mimeType: headers['content-type'] ?? 'application/json', text: JSON.stringify(body) }
+          : undefined,
+        headersSize: -1,
+        bodySize: -1,
+      }
+      return JSON.stringify(harRequest, null, 2)
+    }
+
+    default:
+      return catchUrl
+  }
+}
 
 const SKIP_HEADERS = new Set([
   'host', 'connection', 'transfer-encoding', 'te',
@@ -18,6 +143,27 @@ interface RequestDetailProps {
 export function RequestDetail({ payload, catchUrl }: RequestDetailProps) {
   const [activeTab, setActiveTab] = useState<'body' | 'query'>('body')
   const [copiedHeaders, setCopiedHeaders] = useState(false)
+  const [copyMenuOpen, setCopyMenuOpen] = useState(false)
+  const [copiedFormat, setCopiedFormat] = useState<string | null>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setCopyMenuOpen(false)
+      }
+    }
+    if (copyMenuOpen) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [copyMenuOpen])
+
+  async function handleCopy(format: string) {
+    const text = generateFormat(format, payload, catchUrl)
+    await navigator.clipboard.writeText(text)
+    setCopiedFormat(format)
+    setCopyMenuOpen(false)
+    setTimeout(() => setCopiedFormat(null), 2000)
+  }
 
   const date = new Date(payload.received_at)
   const fullDate = date.toLocaleString(undefined, {
@@ -55,7 +201,46 @@ export function RequestDetail({ payload, catchUrl }: RequestDetailProps) {
       {/* Top bar */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-zinc-800 bg-zinc-900/50 shrink-0">
         <Badge method={payload.method} />
-        <span className="text-sm text-zinc-400 font-mono truncate">{catchUrl}</span>
+        <span className="text-sm text-zinc-400 font-mono truncate flex-1">{catchUrl}</span>
+
+        {/* Copy as dropdown */}
+        <div className="relative shrink-0" ref={menuRef}>
+          <button
+            onClick={() => setCopyMenuOpen(o => !o)}
+            className="flex items-center gap-1.5 rounded-md border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-xs text-zinc-300 hover:border-zinc-600 hover:text-white transition-colors"
+          >
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+              <rect x="5" y="1" width="10" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M11 11v2.5A1.5 1.5 0 019.5 15h-8A1.5 1.5 0 010 13.5v-8A1.5 1.5 0 011.5 4H4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            Copy as
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+
+          {copyMenuOpen && (
+            <div className="absolute right-0 top-full mt-1 w-44 rounded-lg border border-zinc-700 bg-zinc-900 shadow-xl z-50 py-1 overflow-hidden">
+              {FORMATS.map(f => (
+                <button
+                  key={f.id}
+                  onClick={() => handleCopy(f.id)}
+                  className="flex items-center justify-between w-full gap-2 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
+                >
+                  <span className="flex items-center gap-2 text-zinc-500">
+                    {f.icon}
+                    <span className="text-zinc-300">{f.label}</span>
+                  </span>
+                  {copiedFormat === f.id && (
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8l4 4 6-6" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Metadata row */}
