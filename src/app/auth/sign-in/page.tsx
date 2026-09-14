@@ -1,7 +1,11 @@
 import type { Metadata } from 'next'
 import { SignInButton } from '@/components/auth/sign-in-button'
 
-export const metadata: Metadata = { robots: { index: false, follow: false } }
+export const metadata: Metadata = {
+  title: 'Sign In',
+  description: 'Sign in with Google to view your full webhook history and share endpoints with your team.',
+  robots: { index: false, follow: false },
+}
 
 interface Props {
   searchParams: Promise<{ next?: string }>

@@ -6,14 +6,30 @@ export const metadata: Metadata = {
   description: 'Instantly capture, inspect, and debug incoming HTTP webhooks. Free, zero-setup developer tool.',
 }
 
-const jsonLd = {
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
+
+const jsonLdApp = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
   name: 'WebhookCatcher',
+  url: baseUrl,
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Any',
   description: 'Instantly capture, inspect, and debug incoming HTTP webhooks. Free, zero-setup developer tool.',
+  featureList: [
+    'Real-time webhook capture',
+    'Inspect HTTP headers and request body',
+    'Share endpoint history with teammates',
+    'Zero setup — no account required to start',
+  ],
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+}
+
+const jsonLdWebsite = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'WebhookCatcher',
+  url: baseUrl,
 }
 
 export default function HomePage() {
@@ -21,7 +37,11 @@ export default function HomePage() {
     <main className="min-h-screen flex flex-col items-center justify-center px-4">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdApp) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebsite) }}
       />
       <div className="max-w-2xl w-full text-center flex flex-col items-center gap-8">
         {/* Badge */}

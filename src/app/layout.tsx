@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 
@@ -11,6 +11,10 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
 const defaultTitle = 'WebhookCatcher — Free Webhook & HTTP Request Inspector'
 const defaultDescription = 'Generate a unique URL, send any HTTP request to it, and watch payloads arrive live on your dashboard.'
 
+export const viewport: Viewport = {
+  themeColor: '#09090b',
+}
+
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
@@ -18,6 +22,9 @@ export const metadata: Metadata = {
     default: defaultTitle,
   },
   description: defaultDescription,
+  keywords: ['webhook', 'webhook inspector', 'webhook tester', 'http request inspector', 'webhook debugger', 'free webhook tool'],
+  authors: [{ name: 'WebhookCatcher' }],
+  creator: 'WebhookCatcher',
   openGraph: {
     type: 'website',
     siteName: 'WebhookCatcher',
