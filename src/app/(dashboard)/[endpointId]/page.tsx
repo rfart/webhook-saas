@@ -1,4 +1,9 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+
+export async function generateMetadata(): Promise<Metadata> {
+  return { robots: { index: false, follow: false } }
+}
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createSSRServerClient } from '@/lib/supabase/ssr-server'
 import type { WebhookRow } from '@/types'

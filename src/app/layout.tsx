@@ -7,9 +7,29 @@ const inter = Inter({
   variable: '--font-inter',
 })
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
+const defaultTitle = 'WebhookCatcher — Free Webhook & HTTP Request Inspector'
+const defaultDescription = 'Generate a unique URL, send any HTTP request to it, and watch payloads arrive live on your dashboard.'
+
 export const metadata: Metadata = {
-  title: 'WebhookCatcher — Inspect HTTP requests in real time',
-  description: 'Generate a unique URL, send any HTTP request to it, and watch payloads arrive live on your dashboard.',
+  metadataBase: new URL(baseUrl),
+  title: {
+    template: '%s | WebhookCatcher',
+    default: defaultTitle,
+  },
+  description: defaultDescription,
+  openGraph: {
+    type: 'website',
+    siteName: 'WebhookCatcher',
+    title: defaultTitle,
+    description: defaultDescription,
+    url: baseUrl,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: defaultTitle,
+    description: defaultDescription,
+  },
 }
 
 export default function RootLayout({

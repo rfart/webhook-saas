@@ -1,4 +1,7 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+
+export const metadata: Metadata = { robots: { index: false, follow: false } }
 import { createSSRServerClient } from '@/lib/supabase/ssr-server'
 import { GenerateButton } from '@/app/(marketing)/generate-button'
 import { UserMenu } from '@/components/auth/user-menu'

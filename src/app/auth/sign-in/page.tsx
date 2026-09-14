@@ -1,4 +1,7 @@
+import type { Metadata } from 'next'
 import { SignInButton } from '@/components/auth/sign-in-button'
+
+export const metadata: Metadata = { robots: { index: false, follow: false } }
 
 interface Props {
   searchParams: Promise<{ next?: string }>

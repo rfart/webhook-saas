@@ -1,8 +1,28 @@
+import type { Metadata } from 'next'
 import { GenerateButton } from './generate-button'
+
+export const metadata: Metadata = {
+  title: 'WebhookCatcher — Free Webhook & HTTP Request Inspector',
+  description: 'Instantly capture, inspect, and debug incoming HTTP webhooks. Free, zero-setup developer tool.',
+}
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'WebhookCatcher',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Any',
+  description: 'Instantly capture, inspect, and debug incoming HTTP webhooks. Free, zero-setup developer tool.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+}
 
 export default function HomePage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="max-w-2xl w-full text-center flex flex-col items-center gap-8">
         {/* Badge */}
         <span className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900 px-4 py-1.5 text-xs font-medium text-zinc-400">
