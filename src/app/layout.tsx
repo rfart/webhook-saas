@@ -24,12 +24,15 @@ export const metadata: Metadata = {
     title: defaultTitle,
     description: defaultDescription,
     url: baseUrl,
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'WebhookCatcher — Free Webhook & HTTP Request Inspector' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: defaultTitle,
     description: defaultDescription,
+    images: ['/og-image.png'],
   },
+  alternates: { canonical: baseUrl },
 }
 
 export default function RootLayout({
